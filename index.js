@@ -1,30 +1,28 @@
-const xhr = new XMLHttpRequest();
-
 const data = {
   users: [],
   posts: [],
   comments: []
 };
 
-function sendRequest(req, type, url, store, cb) {
-  req.onreadystatechange = _ => {
-    if (req.readyState == 4) {
-      if (req.status == 200) {
-        data[store] = JSON.parse(req.responseText);
+function sendRequest(type, url, store, cb) {
+  const xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = _ => {
+    if (xhr.readyState == 4) {
+      if (xhr.status == 200) {
+        data[store] = JSON.parse(xhr.responseText);
         cb && cb();
       }
-      if (req.status == 404) {
+      if (xhr.status == 404) {
         console.error("404 - not found");
       }
     }
   };
 
-  req.open(type, url);
-  req.send();
+  xhr.open(type, url);
+  xhr.send();
 }
 
 sendRequest(
-  new XMLHttpRequest(),
   "get",
   "https://jsonplaceholder.typicode.com/users",
   "users",
@@ -43,7 +41,6 @@ function renderUsers() {
     li.appendChild(user);
   });
   sendRequest(
-    new XMLHttpRequest(),
     "get",
     "https://jsonplaceholder.typicode.com/posts",
     "posts",
@@ -66,7 +63,6 @@ function loadPosts() {
     });
   }
   sendRequest(
-    new XMLHttpRequest(),
     "get",
     "https://jsonplaceholder.typicode.com/comments",
     "comments",
