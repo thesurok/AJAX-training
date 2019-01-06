@@ -4,31 +4,43 @@ const data = {
   comments: []
 };
 
-function sendRequest(type, url, store, cb) {
-  const xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = e => {
-    if (e.target.readyState == 4) {
-      if (e.target.status == 200) {
-        data[store] = JSON.parse(xhr.responseText);
-        cb && cb();
-      } else {
-        console.error(e.target.status);
-      }
-    }
-  };
-
-  xhr.open(type, url);
-  xhr.send();
-}
-
-sendRequest(
-  "get",
-  "https://jsonplaceholder.typicode.com/users",
-  "users",
-  renderUsers
-);
-
 const users = document.getElementById("users");
+
+const sendRequest = (type, url, store) =>
+  new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = e => {
+      if (e.target.readyState == 4) {
+        if (e.target.status == 200) {
+          data[store] = JSON.parse(xhr.responseText);
+          resolve();
+        } else {
+          reject(e.target.status);
+        }
+      }
+    };
+
+    xhr.open(type, url);
+    xhr.send();
+  });
+
+sendRequest("get", "https://jsonplaceholder.typicode.com/users", "users")
+  .then(renderUsers)
+  .then(
+    sendRequest(
+      "get",
+      "https://jsonplaceholder.typicode.com/posts",
+      "posts"
+    ).then(loadPosts)
+  )
+  .then(
+    sendRequest(
+      "get",
+      "https://jsonplaceholder.typicode.com/comments",
+      "comments"
+    ).then(loadComments)
+  )
+  .catch();
 
 function renderUsers() {
   data.users.forEach(_user => {
@@ -39,12 +51,6 @@ function renderUsers() {
     users.appendChild(li);
     li.appendChild(user);
   });
-  sendRequest(
-    "get",
-    "https://jsonplaceholder.typicode.com/posts",
-    "posts",
-    loadPosts
-  );
 }
 
 function loadPosts() {
@@ -61,12 +67,6 @@ function loadPosts() {
       }
     });
   }
-  sendRequest(
-    "get",
-    "https://jsonplaceholder.typicode.com/comments",
-    "comments",
-    loadComments
-  );
 }
 
 function loadComments() {
