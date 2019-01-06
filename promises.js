@@ -1,31 +1,49 @@
-//Callback
-const getDataCallback = cb => {
-  setTimeout(() => {
-    cb(null, "This is the data");
-  }, 2000);
-};
+// //Callback
+// const getDataCallback = (num, cb) => {
+//   setTimeout(() => {
+//     if (typeof num === "number") {
+//       cb(null, num * 2);
+//     } else {
+//       cb("Number must be provided");
+//     }
+//   }, 2000);
+// };
 
-getDataCallback((err, data) => {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log(data);
-  }
-});
+// getDataCallback(2, (err, data) => {
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     getDataCallback(data, (err, data) => {
+//       if (err) {
+//         console.log(err);
+//       } else {
+//         console.log(data);
+//       }
+//     });
+//   }
+// });
 
-//Promise
-const getDataPromise = data =>
+const getDataPromise = num =>
   new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve(`This is success data ${data}`);
+      typeof num === "number" ? resolve(num * 2) : reject("Error");
     }, 2000);
   });
 
-const myPromise = getDataPromise(1234);
-
-myPromise.then(
+getDataPromise(4).then(
   data => {
-    console.log(data);
+    getDataPromise(data).then(
+      data => {
+        console.log(data);
+      },
+      err => console.log(err)
+    );
   },
   err => console.log(err)
 );
+
+getDataPromise(10)
+  .then(data => {
+    return getDataPromise(data);
+  })
+  .then(data => console.log(data));

@@ -26,21 +26,21 @@ const sendRequest = (type, url, store) =>
 
 sendRequest("get", "https://jsonplaceholder.typicode.com/users", "users")
   .then(renderUsers)
-  .then(
-    sendRequest(
+  .then(_ => {
+    return sendRequest(
       "get",
       "https://jsonplaceholder.typicode.com/posts",
       "posts"
-    ).then(loadPosts)
-  )
-  .then(
-    sendRequest(
+    ).then(loadPosts);
+  })
+  .then(_ => {
+    return sendRequest(
       "get",
       "https://jsonplaceholder.typicode.com/comments",
       "comments"
-    ).then(loadComments)
-  )
-  .catch();
+    ).then(loadComments);
+  })
+  .catch(err => console.log(err));
 
 function renderUsers() {
   data.users.forEach(_user => {
